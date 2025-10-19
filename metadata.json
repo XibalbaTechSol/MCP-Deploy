@@ -1,0 +1,5 @@
+{
+  "name": "MCP Server Deploy",
+  "description": "A platform-as-a-service (PaaS) to simplify the creation, hosting, and integration of Model Context Protocol (MCP) servers with one-click deployment.",
+  "requestFramePermissions": []
+}
