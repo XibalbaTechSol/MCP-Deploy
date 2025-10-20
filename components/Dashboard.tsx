@@ -19,7 +19,6 @@ import CodeIcon from './icons/CodeIcon';
 interface DashboardProps {
   user: User;
   servers: MCPServer[];
-  logs: { [key: string]: string[] };
   onCreateServer: (name: string, template: string) => void;
   onDeleteServer: (id: string) => void;
   onStartServer: (id: string) => void;
@@ -200,7 +199,7 @@ const ServerRow: React.FC<ServerRowProps> = ({ server, onSelect, onDelete, onSta
 }
 
 
-const Dashboard: React.FC<DashboardProps> = ({ user, servers, logs, onCreateServer, onDeleteServer, onStartServer, onStopServer }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, servers, onCreateServer, onDeleteServer, onStartServer, onStopServer }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isPromoteModalOpen, setPromoteModalOpen] = useState(false);
@@ -348,7 +347,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, servers, logs, onCreateServ
       {selectedServer && (
         <ServerDetailPanel
           server={servers.find(s => s.id === selectedServer.id) || selectedServer}
-          logs={logs[selectedServer.id] || []}
           onClose={() => setSelectedServer(null)}
           onDelete={handleDeleteAndClosePanel}
           onStart={onStartServer}

@@ -1,14 +1,26 @@
 
-import React from 'react';
-import GithubIcon from './icons/GithubIcon';
-import GoogleIcon from './icons/GoogleIcon';
+import React, { useState } from 'react';
 import CodeIcon from './icons/CodeIcon';
 
 interface LoginProps {
-  onLogin: (provider: 'Google' | 'GitHub') => void;
+  onLogin: (email, password) => void;
+  onRegister: (email, password) => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC<LoginProps> = ({ onLogin, onRegister }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isRegister, setIsRegister] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isRegister) {
+      onRegister(email, password);
+    } else {
+      onLogin(email, password);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md p-8 space-y-8 bg-slate-800 rounded-xl shadow-lg">
@@ -16,28 +28,49 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <div className="flex justify-center items-center mb-4">
             <CodeIcon className="w-12 h-12 text-cyan-400" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-100">Welcome to MCP Deploy</h1>
-          <p className="mt-2 text-slate-400">Your one-click deployment platform for MCP Servers.</p>
+          <h1 className="text-3xl font-bold text-slate-100">
+            {isRegister ? 'Create an Account' : 'Welcome to MCP Deploy'}
+          </h1>
+          <p className="mt-2 text-slate-400">
+            {isRegister
+              ? 'Your one-click deployment platform for MCP Servers.'
+              : 'Sign in to continue.'}
+          </p>
         </div>
         
-        <div className="space-y-4">
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            required
+          />
           <button
-            onClick={() => onLogin('GitHub')}
-            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 focus:ring-offset-slate-800 transition-colors"
+            type="submit"
+            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
           >
-            <GithubIcon className="w-5 h-5 mr-3" />
-            Continue with GitHub
+            {isRegister ? 'Register' : 'Login'}
           </button>
+        </form>
+
+        <p className="text-center text-sm text-slate-400">
+          {isRegister ? 'Already have an account?' : "Don't have an account?"}
           <button
-            onClick={() => onLogin('Google')}
-            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 focus:ring-offset-slate-800 transition-colors"
+            onClick={() => setIsRegister(!isRegister)}
+            className="font-medium text-cyan-400 hover:text-cyan-300 ml-1"
           >
-            <GoogleIcon className="w-5 h-5 mr-3" />
-            Continue with Google
+            {isRegister ? 'Login' : 'Register'}
           </button>
-        </div>
-        <p className="text-xs text-center text-slate-500">
-          By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
     </div>
