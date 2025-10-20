@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { MCPServer, ServerStatus, ServerMetrics } from '../types';
 import CodeIcon from './icons/CodeIcon';
 import TrashIcon from './icons/TrashIcon';
@@ -18,7 +19,6 @@ import ArrowUpTrayIcon from './icons/ArrowUpTrayIcon';
 
 interface ServerDetailPanelProps {
   server: MCPServer;
-  logs: string[];
   onClose: () => void;
   onPromote: (server: MCPServer) => void;
   onDelete: (id: string) => void;
@@ -98,9 +98,31 @@ const ServerMetricsDisplay: React.FC<{ metrics: ServerMetrics }> = ({ metrics })
     );
 };
 
-const ServerDetailPanel: React.FC<ServerDetailPanelProps> = ({ server, logs, onClose, onPromote, onDelete, onStart, onStop }) => {
+const API_URL = import.meta.env.VITE_API_URL;
+
+const ServerDetailPanel: React.FC<ServerDetailPanelProps> = ({ server, onClose, onPromote, onDelete, onStart, onStop }) => {
   const statusStyle = statusClasses[server.status];
   const [activeTab, setActiveTab] = useState<Tab>('metrics');
+  const [logs, setLogs] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (activeTab === 'logs') {
+      const fetchLogs = async () => {
+        try {
+          const response = await axios.get(`${API_URL}/servers/${server.id}/logs`);
+          setLogs(response.data);
+        } catch (error) {
+          console.error('Failed to fetch logs:', error);
+          setLogs(['Failed to load logs.']);
+        }
+      };
+
+      fetchLogs();
+      const interval = setInterval(fetchLogs, 3000); // Poll for new logs every 3 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [server.id, activeTab]);
   
   const isTransient = [
     ServerStatus.CREATING, ServerStatus.STARTING, ServerStatus.STOPPING, ServerStatus.DELETING
